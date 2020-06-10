@@ -1,0 +1,22 @@
+{
+  "name": "blockchain_authorization",
+  "version": "1.0.0",
+  "description": "Models for utilizing blockchain and smart contract technology with the widely used OAuth 2.0 open authorization framework.",
+  "main": "AgentModel1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DimJ/BlockChain_Authorization.git"
+  },
+  "author": "Dimitrios Dimopoulos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DimJ/BlockChain_Authorization/issues"
+  },
+  "homepage": "https://github.com/DimJ/BlockChain_Authorization#readme",
+  "dependencies": {
+    "web3": "^1.2.9"
+  }
+}
