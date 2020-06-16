@@ -8,10 +8,20 @@
 
 var Client = {
 	
-	intialize : function()
+	intialize : function(myAccountCode, myPaymentAccount)
 	{
 		if (typeof Client.initialized === "undefined") 
 	    {	
+	    	Client.AccountsManagement = require( "../account-management/accountManagement.js" ) 
+	    	Client.AccountsManagement.initialize()
+			
+			Client.myAccountAddress = Client.AccountsManagement.getAccountWithCode(myAccountCode)[0]
+			Client.myAccountPassword = Client.AccountsManagement.getAccountWithCode(myAccountCode)[1]
+			Client.myAccountKeystore = Client.AccountsManagement.getAccountWithCode(myAccountCode)[2]
+
+			Client.paymentAccountAddress = Client.AccountsManagement.getAccountWithCode(myPaymentAccount)[0]
+
+
 	    	Client.generalVariables()
 	    	Client.createEthereumVariables()
 	    	Client.createEthereumObjects()
@@ -33,11 +43,17 @@ var Client = {
 	{
 		// The following variables are required for the comminication with the Ethereum node.
 		Client.scenario1ContractAbi = require( "../smart-contracts/Scenario1_PaymentContract.js" ) 
-		Client.scenario1ContractAddress = "0x63b85ebb403ea8924001b508cd808cd37d5303e5"
-		Client.myAccountAddress = "0x097eb023e45f37160eab845302527b987689f33d" 
-		Client.myAccountPassword = "t0phost4m3*"
-		Client.paymentAccountAddress = "0x097eb023e45f37160eab845302527b987689f33d"
+		Client.scenario1ContractAddress = "0x302c5573c0a164a7927f3addad0f9b64de971937"
+
 		Client.Creator = require( "../initial-setup/CreateContracts.js" )
+		Client.CreateTransaction = require( "../initial-setup/CreateTransactions.js" )
+
+		Client.GAS = 3000000
+		Client.GAS_PRICE = 50000000000
+		Client.RINKEBY_CHAIN_ID = 4
+		Client.AUTHORIZATION_PRIVATE_CHAIN_ID = 30
+		// ClientDistributed.PAYMENT_PRIVATE_CHAIN_ID = 31
+		Client.PAYMENT_PRIVATE_CHAIN_ID = 4 
 	},
 	
 	createEthereumObjects : function()
@@ -45,6 +61,8 @@ var Client = {
 		Client.Web3Creator = new Client.Creator(Client.privateEthereumHttpEndpoint, Client.privateEthereumWsEndpoint);
 		Client.Scenario1_PaymentContract = Client.Web3Creator.createSmartContract(Client.scenario1ContractAbi, Client.scenario1ContractAddress)
 		Client.Scenario1_PaymentContractEvents = Client.Web3Creator.createSmartContractForEvents(Client.scenario1ContractAbi, Client.scenario1ContractAddress)
+	
+		Client.decryptedAccount = Client.Web3Creator.returnWeb3().eth.accounts.decrypt(Client.myAccountKeystore, Client.myAccountPassword)
 	},
 
 	sendHttpRequest : function(serverHttpRequest)
@@ -66,11 +84,12 @@ var Client = {
 
 	step4 : function( amount )
 	{
-		Client.Web3Creator.returnWeb3().eth.personal.unlockAccount( Client.myAccountAddress, Client.myAccountPassword, 600)
-		.then( () => {
-			console.log("Send transaction.")
-			Client.Scenario1_PaymentContract.methods.deposit().send({from:Client.myAccountAddress, value:amount});
-		})
+		Client.Web3Creator.returnWeb3().eth.getTransactionCount( Client.myAccountAddress, function(error, result){
+			let lastPaymentTrxNumber = result;
+			let data = Client.Scenario1_PaymentContract.methods.deposit().encodeABI()
+			let rawTransaction = Client.CreateTransaction.getTransaction(lastPaymentTrxNumber, Client.myAccountAddress, Client.paymentContractAddress, 0, Client.GAS, Client.GAS_PRICE, Client.PAYMENT_PRIVATE_CHAIN_ID, data)
+			Client.CreateTransaction.sendTransaction(Client.decryptedAccount, rawTransaction, Client.Web3Creator.returnWeb3() )
+		});
 	}
 
 }

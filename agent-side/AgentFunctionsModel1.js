@@ -61,10 +61,10 @@ var Agent = {
 	createEthereumObjects : function()
 	{
 		Agent.Web3Creator = new Agent.Creator(Agent.privateEthereumHttpEndpoint, Agent.privateEthereumWsEndpoint)
-		//Agent.Scenario1_PaymentContract = Agent.Web3Creator.createSmartContract(Agent.scenario1ContractAbi, Agent.scenario1ContractAddress)
-		//Agent.Scenario1_PaymentContractEvents = Agent.Web3Creator.createSmartContractForEvents(Agent.scenario1ContractAbi, Agent.scenario1ContractAddress)
+		Agent.Scenario1_PaymentContract = Agent.Web3Creator.createSmartContract(Agent.scenario1ContractAbi, Agent.scenario1ContractAddress)
+		Agent.Scenario1_PaymentContractEvents = Agent.Web3Creator.createSmartContractForEvents(Agent.scenario1ContractAbi, Agent.scenario1ContractAddress)
 	
-		// Agent.decryptedAccount = Agent.Web3CreatorPayment.returnWeb3().eth.accounts.decrypt(Agent.myAccountKeystore, Agent.myAccountPassword)
+		Agent.decryptedAccount = Agent.Web3Creator.returnWeb3().eth.accounts.decrypt(Agent.myAccountKeystore, Agent.myAccountPassword)
 
 	},
 

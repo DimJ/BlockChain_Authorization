@@ -9,28 +9,27 @@ const port = 3000
 const host = '127.0.0.1'
 const Agent = require('./agent-side/AgentFunctionsModel1.js') // Behavior of the Agent.
 
+Agent.intialize(1, 2) // Execute initialize first.
+
 const server = http.createServer( Agent.serveRequest ); // Create the HTTP server.
 server.listen(port, host)
 console.log(`Listening at http://${host}:${port}`)
 
-Agent.intialize(1, 2) // Execute initialize first.
-
 // EVENTS
-// Agent.Scenario1_PaymentContractEvents.events.DepositEvent( // Listener for Deposit event
-// 	{fromBlock: "latest"},
-// 	function(error, result) {
-//     	if (!error)
-//         {
-//             console.log("Step 4 complete");
-//             console.log(result.returnValues)
-//             console.log(" ---- ");
-//             console.log("Starting Step 5: Validation and payment.");
-//             Agent.step5( Agent.sectetKey, Agent.paymentAccountAddress )
-//         }
-//         else
-//         {
-//             console.log(error);
-//         }
-//     }
-// )
-
+Agent.Scenario1_PaymentContractEvents.events.DepositEvent( // Listener for Deposit event
+	{fromBlock: "latest"},
+	function(error, result) {
+    	if (!error)
+        {
+            console.log("Step 4 complete");
+            console.log(result.returnValues)
+            console.log(" ---- ");
+            console.log("Starting Step 5: Validation and payment.");
+            Agent.step5( Agent.sectetKey, Agent.paymentAccountAddress )
+        }
+        else
+        {
+            console.log(error);
+        }
+    }
+)

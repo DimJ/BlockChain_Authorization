@@ -8,7 +8,7 @@ const http = require('http'); // use http protocol for server and client
 const serverHttpRequest = "http://localhost:3000" // Agent's  address
 const Client = require('./client-side/ClientFunctionsModel1.js') // Behavior of the Agent. 
 
-Client.intialize() // Execute initialize if we have to.
+Client.intialize(2,3) // Execute initialize if we have to.
 
 Client.sendHttpRequest(serverHttpRequest) // Step 1 : Request for token from server.
 
@@ -34,19 +34,19 @@ Client.Scenario1_PaymentContractEvents.events.SetHashLockEvent( // Listener for 
     }
 )
 
-Client.Scenario1_PaymentContractEvents.events.ValidationAndPaymentEvent( // Listener for ValidationAndPayment event
-	{fromBlock: "latest"},
-	function(error, result) {
-    	if (!error)
-        {
-            console.log("Step 5 complete");
-            console.log(result.returnValues)
-            console.log(" ---- The protocol is complete. ");
-            process.exit() // STOP THE CURRENT SCRIPT
-        }
-        else
-        {
-            console.log(error);
-        }
-    }
-)
+// Client.Scenario1_PaymentContractEvents.events.ValidationAndPaymentEvent( // Listener for ValidationAndPayment event
+// 	{fromBlock: "latest"},
+// 	function(error, result) {
+//     	if (!error)
+//         {
+//             console.log("Step 5 complete");
+//             console.log(result.returnValues)
+//             console.log(" ---- The protocol is complete. ");
+//             process.exit() // STOP THE CURRENT SCRIPT
+//         }
+//         else
+//         {
+//             console.log(error);
+//         }
+//     }
+// )
