@@ -21,7 +21,6 @@ var Client = {
 
 			Client.paymentAccountAddress = Client.AccountsManagement.getAccountWithCode(myPaymentAccount)[0]
 
-
 	    	Client.generalVariables()
 	    	Client.createEthereumVariables()
 	    	Client.createEthereumObjects()
@@ -34,8 +33,8 @@ var Client = {
 	{
 		Client.http = require('http')
 		Client.scenario1RequestForCWT = "http://localhost/oauth2_sofie/cborToken.php?typeOfScenario=scenario1"
-		Client.privateEthereumHttpEndpoint = "http://localhost:8572"
-		Client.privateEthereumWsEndpoint = "ws://localhost:8574"
+		Client.privateEthereumHttpEndpoint = "https://rinkeby.infura.io/v3/07b06e4e587148a68c9cc836f97efb4f"
+		Client.privateEthereumWsEndpoint = "wss://rinkeby.infura.io/ws/v3/07b06e4e587148a68c9cc836f97efb4f"
     	Client.initialized = "initialized" // This object is initialized.
 	}, 
 	
@@ -54,15 +53,19 @@ var Client = {
 		Client.AUTHORIZATION_PRIVATE_CHAIN_ID = 30
 		// ClientDistributed.PAYMENT_PRIVATE_CHAIN_ID = 31
 		Client.PAYMENT_PRIVATE_CHAIN_ID = 4 
+
+		/* We store the secret key, in order to send it after Deposit event */
+		Client.sectetKey = "" 
 	},
 	
 	createEthereumObjects : function()
 	{
-		Client.Web3Creator = new Client.Creator(Client.privateEthereumHttpEndpoint, Client.privateEthereumWsEndpoint);
+		Client.Web3Creator = new Client.Creator(Client.privateEthereumHttpEndpoint, Client.privateEthereumWsEndpoint)
 		Client.Scenario1_PaymentContract = Client.Web3Creator.createSmartContract(Client.scenario1ContractAbi, Client.scenario1ContractAddress)
 		Client.Scenario1_PaymentContractEvents = Client.Web3Creator.createSmartContractForEvents(Client.scenario1ContractAbi, Client.scenario1ContractAddress)
 	
 		Client.decryptedAccount = Client.Web3Creator.returnWeb3().eth.accounts.decrypt(Client.myAccountKeystore, Client.myAccountPassword)
+
 	},
 
 	sendHttpRequest : function(serverHttpRequest)
@@ -87,7 +90,7 @@ var Client = {
 		Client.Web3Creator.returnWeb3().eth.getTransactionCount( Client.myAccountAddress, function(error, result){
 			let lastPaymentTrxNumber = result;
 			let data = Client.Scenario1_PaymentContract.methods.deposit().encodeABI()
-			let rawTransaction = Client.CreateTransaction.getTransaction(lastPaymentTrxNumber, Client.myAccountAddress, Client.paymentContractAddress, 0, Client.GAS, Client.GAS_PRICE, Client.PAYMENT_PRIVATE_CHAIN_ID, data)
+			let rawTransaction = Client.CreateTransaction.getTransaction(lastPaymentTrxNumber, Client.myAccountAddress, Client.scenario1ContractAddress, amount, Client.GAS, Client.GAS_PRICE, Client.PAYMENT_PRIVATE_CHAIN_ID, data)
 			Client.CreateTransaction.sendTransaction(Client.decryptedAccount, rawTransaction, Client.Web3Creator.returnWeb3() )
 		});
 	}

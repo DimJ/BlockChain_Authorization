@@ -10,6 +10,15 @@ var Agent = {
 	{
 		if (typeof Agent.initialized === "undefined") 
 	    {	
+	    	Agent.AccountsManagement = require( "../account-management/accountManagement.js" ) 
+	    	Agent.AccountsManagement.initialize()
+			
+			Agent.myAccountAddress = Agent.AccountsManagement.getAccountWithCode(myAccountCode)[0]
+			Agent.myAccountPassword = Agent.AccountsManagement.getAccountWithCode(myAccountCode)[1]
+			Agent.myAccountKeystore = Agent.AccountsManagement.getAccountWithCode(myAccountCode)[2]
+
+			Agent.paymentAccountAddress = Agent.AccountsManagement.getAccountWithCode(myPaymentAccount)[0]
+
 	    	Agent.generalVariables()
 	    	Agent.createEthereumVariables()
 	    	Agent.createEthereumObjects()
@@ -20,8 +29,8 @@ var Agent = {
 	{
 		Agent.http = require('http')
 		Agent.scenario2RequestForCWT = "http://localhost/oauth2_sofie/cborToken.php?typeOfScenario=scenario2"
-		Agent.privateEthereumHttpEndpoint = "http://localhost:8572"
-		Agent.privateEthereumWsEndpoint = "ws://localhost:8574"
+		Agent.privateEthereumHttpEndpoint = "https://rinkeby.infura.io/v3/07b06e4e587148a68c9cc836f97efb4f"
+		Agent.privateEthereumWsEndpoint = "wss://rinkeby.infura.io/ws/v3/07b06e4e587148a68c9cc836f97efb4f"
     	Agent.initialized = "initialized" // This object is initialized.
 	}, 
 	
@@ -30,10 +39,16 @@ var Agent = {
 		// The following variables are required for the communication with the Ethereum node.
 		Agent.scenario2ContractAbi = require( "../smart-contracts/Scenario2_PaymentContract.js" ) 
 		Agent.scenario2ContractAddress = "0x602e9d20bdee910a4b75df2b6782c4b67ebab7cc"
-		Agent.myAccountAddress = "0x097eb023e45f37160eab845302527b987689f33d"
-		Agent.myAccountPassword = "t0phost4m3*"
-		Agent.paymentAccountAddress = "0x097eb023e45f37160eab845302527b987689f33d"
+
 		Agent.Creator = require( "../initial-setup/CreateContracts.js" )
+		Agent.CreateTransaction = require( "../initial-setup/CreateTransactions.js" )
+
+		Agent.GAS = 3000000
+		Agent.GAS_PRICE = 50000000000
+		Agent.RINKEBY_CHAIN_ID = 4
+		Agent.AUTHORIZATION_PRIVATE_CHAIN_ID = 30
+		// AgentDistributed.PAYMENT_PRIVATE_CHAIN_ID = 31
+		Agent.PAYMENT_PRIVATE_CHAIN_ID = 4 
 
 		/* We store the secret key, in order to send it after Deposit event */
 		Agent.sectetKey = "" 
@@ -50,21 +65,28 @@ var Agent = {
 	{
 		Agent.intialize()
 		console.log("- (AuthorizationChain) Set Information ")
-		Agent.Web3Creator.returnWeb3().eth.personal.unlockAccount( Agent.myAccountAddress, Agent.myAccountPassword, 600)
-		.then( () => {
-			let hashOfKey = "0x"+jsonInput.h;	        
-			Agent.Scenario2_PaymentContract.methods.setInformation(jsonInput.e_thing_pop, jsonInput.e_s_token, jsonInput.e_client_pop, hashOfKey, jsonInput.price).send({from:Agent.myAccountAddress, gas:3000000})		 
-		})
+
+		Agent.Web3Creator.returnWeb3().eth.getTransactionCount( Agent.myAccountAddress, function(error, result){
+			let lastPaymentTrxNumber = result;
+			let hashOfKey = "0x"+jsonInput.h;
+			let data = Agent.Scenario2_PaymentContract.methods.setInformation(jsonInput.e_thing_pop, jsonInput.e_s_token, jsonInput.e_client_pop, hashOfKey, jsonInput.price).encodeABI()
+			let rawTransaction = Agent.CreateTransaction.getTransaction(lastPaymentTrxNumber, Agent.myAccountAddress, Agent.scenario2ContractAddress, 0, Agent.GAS, Agent.GAS_PRICE, Agent.PAYMENT_PRIVATE_CHAIN_ID, data)
+			Agent.CreateTransaction.sendTransaction(Agent.decryptedAccount, rawTransaction, Agent.Web3Creator.returnWeb3() )
+		});
+
 	},
 
 	step5 : function(secretKey, paymentAccountAddress)
 	{
 		Agent.intialize()
 		console.log("- (PaymentChain) Validation and Payment for secret-key: "+secretKey)
-		Agent.Web3Creator.returnWeb3().eth.personal.unlockAccount( Agent.myAccountAddress, Agent.myAccountPassword, 600)
-		.then( () => {
-			Agent.Scenario2_PaymentContract.methods.validationAndPayment(secretKey, paymentAccountAddress).send({from:Agent.myAccountAddress, gas:3000000})
-		})
+		
+		Agent.Web3Creator.returnWeb3().eth.getTransactionCount( Agent.myAccountAddress, function(error, result){
+			let lastPaymentTrxNumber = result;
+			let data = Agent.Scenario2_PaymentContract.methods.validationAndPayment(secretKey, paymentAccountAddress).encodeABI()
+			let rawTransaction = Agent.CreateTransaction.getTransaction(lastPaymentTrxNumber, Agent.myAccountAddress, Agent.scenario2ContractAddress, 0, Agent.GAS, Agent.GAS_PRICE, Agent.PAYMENT_PRIVATE_CHAIN_ID, data)
+			Agent.CreateTransaction.sendTransaction(Agent.decryptedAccount, rawTransaction, Agent.Web3Creator.returnWeb3() )
+		});
 	}
 
 

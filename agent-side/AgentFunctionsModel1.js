@@ -114,7 +114,7 @@ var Agent = {
 		Agent.Web3Creator.returnWeb3().eth.getTransactionCount( Agent.myAccountAddress, function(error, result){
 			let lastPaymentTrxNumber = result;
 			let data = Agent.Scenario1_PaymentContract.methods.setHashLock(hashOfKey, hashOfRestInfo).encodeABI()
-			let rawTransaction = Agent.CreateTransaction.getTransaction(lastPaymentTrxNumber, Agent.myAccountAddress, Agent.paymentContractAddress, 0, Agent.GAS, Agent.GAS_PRICE, Agent.PAYMENT_PRIVATE_CHAIN_ID, data)
+			let rawTransaction = Agent.CreateTransaction.getTransaction(lastPaymentTrxNumber, Agent.myAccountAddress, Agent.scenario1ContractAddress, 0, Agent.GAS, Agent.GAS_PRICE, Agent.PAYMENT_PRIVATE_CHAIN_ID, data)
 			Agent.CreateTransaction.sendTransaction(Agent.decryptedAccount, rawTransaction, Agent.Web3Creator.returnWeb3() )
 		});
 
@@ -127,7 +127,7 @@ var Agent = {
 		Agent.Web3Creator.returnWeb3().eth.getTransactionCount( Agent.myAccountAddress, function(error, result){
 			let lastPaymentTrxNumber = result;
 			let data = Agent.Scenario1_PaymentContract.methods.validationAndPayment(secretKey, paymentAccountAddress).encodeABI()
-			let rawTransaction = Agent.CreateTransaction.getTransaction(lastPaymentTrxNumber, Agent.myAccountAddress, Agent.paymentContractAddress, 0, Agent.GAS, Agent.GAS_PRICE, Agent.PAYMENT_PRIVATE_CHAIN_ID, data)
+			let rawTransaction = Agent.CreateTransaction.getTransaction(lastPaymentTrxNumber, Agent.myAccountAddress, Agent.scenario1ContractAddress, 0, Agent.GAS, Agent.GAS_PRICE, Agent.PAYMENT_PRIVATE_CHAIN_ID, data)
 			Agent.CreateTransaction.sendTransaction(Agent.decryptedAccount, rawTransaction, Agent.Web3Creator.returnWeb3() )
 		});
 	}
