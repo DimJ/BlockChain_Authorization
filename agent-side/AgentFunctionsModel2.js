@@ -38,7 +38,7 @@ var Agent = {
 	{
 		// The following variables are required for the communication with the Ethereum node.
 		Agent.scenario2ContractAbi = require( "../smart-contracts/Scenario2_PaymentContract.js" ) 
-		Agent.scenario2ContractAddress = "0x602e9d20bdee910a4b75df2b6782c4b67ebab7cc"
+		Agent.scenario2ContractAddress = "0x0c36278f46e4e7e5b927c217cbd90d5d73b7b9f8"
 
 		Agent.Creator = require( "../initial-setup/CreateContracts.js" )
 		Agent.CreateTransaction = require( "../initial-setup/CreateTransactions.js" )
