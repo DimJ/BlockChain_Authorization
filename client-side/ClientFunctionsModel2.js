@@ -6,7 +6,7 @@
 */
 var Client = {
 	
-	initialize : function()
+	initialize : function(myAccountCode, myPaymentAccount)
 	{
 		if (typeof Client.initialized === "undefined") 
 	    {	
@@ -59,6 +59,9 @@ var Client = {
 		Client.Web3Creator = new Client.Creator(Client.privateEthereumHttpEndpoint, Client.privateEthereumWsEndpoint);
 		Client.Scenario2_PaymentContract = Client.Web3Creator.createSmartContract(Client.scenario2ContractAbi, Client.scenario2ContractAddress)
 		Client.Scenario2_PaymentContractEvents = Client.Web3Creator.createSmartContractForEvents(Client.scenario2ContractAbi, Client.scenario2ContractAddress)
+	
+		Client.decryptedAccount = Client.Web3Creator.returnWeb3().eth.accounts.decrypt(Client.myAccountKeystore, Client.myAccountPassword)
+	
 	},
 
 	step1 : function()

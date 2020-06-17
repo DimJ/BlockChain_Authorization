@@ -6,7 +6,7 @@
 const http = require('http')
 const Client = require('./client-side/ClientFunctionsModel2.js') // Behavior of the Client.
 
-Client.initialize() // Execute initialize if we have to.
+Client.initialize(2, 3) // Execute initialize if we have to.
 
 Client.step1() // Start the protocol.
 

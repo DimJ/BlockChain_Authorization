@@ -6,7 +6,7 @@
 const http = require('http')
 const Agent = require('./agent-side/AgentFunctionsModel2.js') // Behavior of the Agent.
 
-Agent.intialize() // Execute initialize if we have to.
+Agent.intialize(1, 2) // Execute initialize if we have to.
 
 // EVENTS
 Agent.Scenario2_PaymentContractEvents.events.RequestEvent( // Listener for Request event.
